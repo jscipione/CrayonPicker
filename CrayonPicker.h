@@ -21,7 +21,7 @@ class SelectedCrayon;
 
 class CrayonPicker : public BView {
 public:
-								CrayonPicker(rgb_color color);
+								CrayonPicker();
 	virtual						~CrayonPicker();
 
 	virtual	void				AttachedToWindow();
