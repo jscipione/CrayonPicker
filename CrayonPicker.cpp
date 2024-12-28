@@ -12,7 +12,6 @@
 #include <Bitmap.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
-#include <PickerProtocol.h>
 #include <Rect.h>
 #include <SpaceLayoutItem.h>
 
@@ -20,14 +19,14 @@
 #include "SelectedCrayon.h"
 
 
-CrayonPicker::CrayonPicker()
+CrayonPicker::CrayonPicker(rgb_color color)
 	:
 	BView("crayon color picker", B_WILL_DRAW),
-	fColor(make_color(255, 0, 255))
+	fColor(color)
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fSelectedColor = new SelectedCrayon(fColor);
+	fSelectedColor = new SelectedCrayon(color);
 
 	// add a bunch of crayons
 	for (int32 i = 0; i < kMaxCrayonCount; i++)
@@ -192,16 +191,21 @@ CrayonPicker::AttachedToWindow()
 void
 CrayonPicker::MessageReceived(BMessage* message)
 {
-	char* name;
-	type_code type;
-	rgb_color* color;
-	ssize_t size;
-	if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
-		&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
-		SetColor(*color);
-		message->AddPointer("be:source", this);
-		message->AddMessenger("be:sender", BMessenger(this));
-		Window()->PostMessage(message);
+	if (message->WasDropped() || message->what == B_VALUE_CHANGED) {
+		char* name;
+		type_code type;
+		if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type)
+				== B_OK) {
+			rgb_color* color;
+			ssize_t size;
+			if (message->FindData(name, type, (const void**)&color, &size)
+					== B_OK) {
+				SetColor(*color);
+
+				// forward message onto window
+				Window()->PostMessage(message);
+			}
+		}
 	} else
 		BView::MessageReceived(message);
 }
@@ -210,10 +214,9 @@ CrayonPicker::MessageReceived(BMessage* message)
 void
 CrayonPicker::SetColor(rgb_color color)
 {
-	color.alpha = 255;
-	if (fColor == color)
-		return;
-
 	fColor = color;
-	fSelectedColor->SetColor(color);
+	if (fSelectedColor != NULL) {
+		fSelectedColor->SetColor(color);
+		fSelectedColor->Invalidate(fSelectedColor->Bounds());
+	}
 }

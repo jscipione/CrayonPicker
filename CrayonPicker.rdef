@@ -2,7 +2,7 @@
 resource app_signature "application/x-vnd.Haiku-CrayonPicker";
 
 resource app_version {
-	major  = 1,
+	major  = 2,
 	middle = 0,
 	minor  = 0,
 

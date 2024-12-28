@@ -11,7 +11,6 @@
 
 #include <Bitmap.h>
 #include <Message.h>
-#include <PickerProtocol.h>
 #include <Rect.h>
 
 
@@ -126,8 +125,7 @@ Crayon::Crayon()
 	BControl(BRect(0, 0, kCrayonWidth - 1, kCrayonHeight - 1), "Crayon", "",
 		new BMessage(B_VALUE_CHANGED), B_FOLLOW_NONE, B_WILL_DRAW),
 	fColor((rgb_color) { 0, 0, 0 }),
-	fIcon(NULL),
-	fMouseDownMessage(NULL)
+	fIcon(NULL)
 {
 }
 
@@ -137,8 +135,7 @@ Crayon::Crayon(rgb_color color)
 	BControl(BRect(0, 0, kCrayonWidth - 1, kCrayonHeight - 1), "Crayon", "",
 		new BMessage(B_VALUE_CHANGED), B_FOLLOW_NONE, B_WILL_DRAW),
 	fColor(color),
-	fIcon(NULL),
-	fMouseDownMessage(NULL)
+	fIcon(NULL)
 {
 }
 
@@ -183,11 +180,10 @@ Crayon::Invoke(BMessage* message)
 	if (message == NULL)
 		message = Message();
 
-	message->AddData("be:value", B_RGB_COLOR_TYPE,
-		&fColor, sizeof(fColor));
-	message->AddInt64("be:when", (int64)system_time());
-	message->AddPointer("be:source", (void*)Parent());
-	message->AddMessenger("be:sender", BMessenger(Parent()));
+	message->RemoveName("be:value");
+	message->AddData("be:value", B_RGB_COLOR_TYPE, &fColor, sizeof(fColor));
+	message->RemoveName("when");
+	message->AddInt64("when", (int64)system_time());
 
 	return BControl::Invoke(message);
 }
@@ -196,20 +192,8 @@ Crayon::Invoke(BMessage* message)
 void
 Crayon::MouseDown(BPoint where)
 {
-	fMouseDownMessage = new BMessage(B_VALUE_CHANGED);
-	Invoke(fMouseDownMessage);
-
+	Invoke();
 	BControl::MouseDown(where);
-}
-
-
-void
-Crayon::MouseUp(BPoint where)
-{
-	delete fMouseDownMessage;
-	fMouseDownMessage = NULL;
-
-	BControl::MouseUp(where);
 }
 
 
@@ -225,6 +209,6 @@ Crayon::SetColor(rgb_color color)
 {
 	color.alpha = 255;
 	fColor = color;
-	if (Window() != NULL)
+	if (Window())
 		Invalidate(Bounds());
 }
