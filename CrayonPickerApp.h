@@ -24,7 +24,6 @@ public:
 
 private:
 			CrayonPickerPanel*	fPanel;
-			rgb_color			fDefaultColor;
 };
 
 
