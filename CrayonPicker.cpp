@@ -47,12 +47,10 @@ CrayonPicker::CrayonPicker()
 				.Add(fCrayonList[5])
 				.Add(fCrayonList[6])
 				.Add(fCrayonList[7])
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 			.End()
 			.AddGroup(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 				.Add(fCrayonList[8])
 				.Add(fCrayonList[9])
 				.Add(fCrayonList[10])
@@ -71,12 +69,10 @@ CrayonPicker::CrayonPicker()
 				.Add(fCrayonList[21])
 				.Add(fCrayonList[22])
 				.Add(fCrayonList[23])
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 			.End()
 			.AddGroup(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 				.Add(fCrayonList[24])
 				.Add(fCrayonList[25])
 				.Add(fCrayonList[26])
@@ -95,12 +91,10 @@ CrayonPicker::CrayonPicker()
 				.Add(fCrayonList[37])
 				.Add(fCrayonList[38])
 				.Add(fCrayonList[39])
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 			.End()
 			.AddGroup(B_HORIZONTAL, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING))
+				.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 				.Add(fCrayonList[40])
 				.Add(fCrayonList[41])
 				.Add(fCrayonList[42])
@@ -199,9 +193,16 @@ CrayonPicker::MessageReceived(BMessage* message)
 	if (message->GetInfo(B_RGB_COLOR_TYPE, 0, &name, &type) == B_OK
 		&& message->FindData(name, type, (const void**)&color, &size) == B_OK) {
 		SetColor(*color);
-		message->AddPointer("be:source", this);
-		message->AddMessenger("be:sender", BMessenger(this));
-		Window()->PostMessage(message);
+
+		BMessenger messenger;
+		if (message->FindMessenger("be:sender", &messenger) == B_OK
+			&& messenger != BMessenger(Window())) {
+			message->AddData("be:value", B_RGB_COLOR_TYPE, color, sizeof(*color));
+			message->AddMessenger("be:sender", BMessenger(this));
+			message->AddPointer("source", this);
+			message->AddInt64("when", (int64)system_time());
+			Window()->PostMessage(message);
+		}
 	} else
 		BView::MessageReceived(message);
 }
