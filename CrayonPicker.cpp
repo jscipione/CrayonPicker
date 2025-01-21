@@ -1,7 +1,7 @@
 /*
+ * Copyright 2012-2025 John Scipione. All rights reserved.
  * Copyright 1999, Be Incorporated. All rights reserved.
- * Copyright 2012-2023 John Scipione All rights reserved.
- * Distributed under the terms of the MIT License.
+ *
  * This file may be used under the terms of the Be Sample Code License.
  */
 
@@ -20,17 +20,24 @@
 #include "SelectedCrayon.h"
 
 
+static const rgb_color kRed = make_color(255, 0, 0, 255);
+
+
 CrayonPicker::CrayonPicker()
 	:
 	BView("crayon color picker", B_WILL_DRAW),
-	fColor(make_color(255, 0, 255))
+	fColor(kRed),
+	fSelectedColor(NULL),
+	fCrayonCount(kMaxCrayonCount),
+	fMouseOffset(B_ORIGIN),
+	fMouseDown(false)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fSelectedColor = new SelectedCrayon(fColor);
 
 	// add a bunch of crayons
-	for (int32 i = 0; i < kMaxCrayonCount; i++)
+	for (int32 i = 0; i < fCrayonCount; i++)
 		fCrayonList[i] = new Crayon();
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
@@ -119,7 +126,7 @@ void
 CrayonPicker::AttachedToWindow()
 {
 	fSelectedColor->SetTarget(this);
-	for (int32 i = 0; i < kMaxCrayonCount; i++)
+	for (int32 i = 0; i < fCrayonCount; i++)
 		fCrayonList[i]->SetTarget(this);
 
 	SetColor(fColor);
@@ -178,7 +185,7 @@ CrayonPicker::AttachedToWindow()
 	fCrayonList[46]->SetColor(make_color(0, 0, 0));
 	fCrayonList[47]->SetColor(make_color(255, 255, 255));
 
-	for (int32 i = 0; i < kMaxCrayonCount; i++)
+	for (int32 i = 0; i < fCrayonCount; i++)
 		fCrayonList[i]->Invalidate();
 }
 
@@ -198,6 +205,51 @@ CrayonPicker::MessageReceived(BMessage* message)
 			Window()->PostMessage(message);
 	} else
 		BView::MessageReceived(message);
+}
+
+
+void
+CrayonPicker::MouseDown(BPoint where)
+{
+	fMouseOffset = where;
+	fMouseDown = true;
+
+	if (Window() == NULL)
+		return BView::MouseDown(where);
+
+	Window()->Activate();
+
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY
+		| B_SUSPEND_VIEW_FOCUS | B_LOCK_WINDOW_FOCUS);
+
+	BView::MouseDown(where);
+}
+
+
+void
+CrayonPicker::MouseMoved(BPoint where, uint32 code,
+	const BMessage* dragMessage)
+{
+	if (Window() == NULL || Window()->CurrentMessage() == NULL)
+		return BView::MouseMoved(where, code, dragMessage);
+
+	uint32 buttons = Window()->CurrentMessage()->GetInt32("buttons", 0);
+	if (fMouseDown && buttons == B_PRIMARY_MOUSE_BUTTON) {
+		BPoint windowPosition = Window()->Frame().LeftTop();
+		Window()->MoveTo(windowPosition.x + where.x - fMouseOffset.x,
+			windowPosition.y + where.y - fMouseOffset.y);
+	} else
+		BView::MouseMoved(where, code, dragMessage);
+}
+
+
+void
+CrayonPicker::MouseUp(BPoint where)
+{
+	fMouseOffset = B_ORIGIN;
+	fMouseDown = false;
+
+	BView::MouseUp(where);
 }
 
 
