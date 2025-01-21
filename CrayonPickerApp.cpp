@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2023 2023 John Scipione All rights reserved.
+ * Copyright 2012-2025 John Scipione. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,6 @@
 
 #include "CrayonPickerApp.h"
 
-#include <ColorPickerPanel.h>
 #include <LayoutBuilder.h>
 #include <PickerProtocol.h>
 #include <Window.h>
@@ -21,13 +20,6 @@ const char* kSignature = "application/x-vnd.Haiku-CrayonPicker";
 
 
 //	#pragma mark - CrayonPickerPanel
-
-
-class CrayonPickerPanel : public BColorPickerPanel {
-public:
-					CrayonPickerPanel(CrayonPicker* view, BMessage* message);
-	virtual			~CrayonPickerPanel();
-};
 
 
 CrayonPickerPanel::CrayonPickerPanel(CrayonPicker* view, BMessage* message)
