@@ -22,10 +22,10 @@ const char* kSignature = "application/x-vnd.Haiku-CrayonPicker";
 //	#pragma mark - CrayonPickerPanel
 
 
-CrayonPickerPanel::CrayonPickerPanel(CrayonPicker* view, BMessage* message)
+CrayonPickerPanel::CrayonPickerPanel(CrayonPicker* view, BMessage* message,
+	BMessage* options)
 	:
-	BColorPickerPanel((BView*)view, message, BColorPickerPanel::B_CELLS_10x4,
-		"Pick a color")
+	BColorPickerPanel((BView*)view, message, options, "Pick a color")
 {
 }
 
@@ -58,7 +58,9 @@ CrayonPickerApp::MessageReceived(BMessage* message)
 		// This is the initial open message that ModuleProxy::Invoke
 		// is sending us. Pass it on to the new color picker dialog
 		// where all the details will be found.
-		fPanel = new CrayonPickerPanel(new CrayonPicker(), message);
+		BMessage* options = new BMessage();
+		options->AddInt32("layout", BColorPickerPanel::B_CELLS_10x4);
+		fPanel = new CrayonPickerPanel(new CrayonPicker(), message, options);
 	}
 
 	BApplication::MessageReceived(message);
@@ -87,11 +89,11 @@ CrayonPickerApp::ReadyToRun()
 
 
 extern "C" BColorPickerPanel*
-instantiate_color_picker(BView* view, BMessage* message,
-	BColorPickerPanel::color_cells_layout layout, const char* name,
-	window_look look, window_feel feel, uint32 flags, uint32 workspace)
+instantiate_color_picker(BView* view, BMessage* message, BMessage* options,
+	const char* name, window_look look, window_feel feel, uint32 flags,
+	uint32 workspace)
 {
-	return new CrayonPickerPanel((CrayonPicker*)view, message);
+	return new CrayonPickerPanel((CrayonPicker*)view, message, options);
 }
 
 

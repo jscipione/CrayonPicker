@@ -20,7 +20,9 @@ class CrayonPicker;
 
 class CrayonPickerPanel : public BColorPickerPanel {
 public:
-					CrayonPickerPanel(CrayonPicker* view, BMessage* message);
+					CrayonPickerPanel(CrayonPicker* view,
+						BMessage* message,
+						BMessage* options);
 	virtual			~CrayonPickerPanel();
 };
 
