@@ -24,7 +24,7 @@ const char* kSignature = "application/x-vnd.Haiku-CrayonPicker";
 
 CrayonPickerPanel::CrayonPickerPanel(CrayonPicker* view, BMessage* message)
 	:
-	BColorPickerPanel((BView*)view, message, BColorPickerPanel::B_CELLS_4x10,
+	BColorPickerPanel((BView*)view, message, BColorPickerPanel::B_CELLS_10x4,
 		"Pick a color")
 {
 }
@@ -88,7 +88,7 @@ CrayonPickerApp::ReadyToRun()
 
 extern "C" BColorPickerPanel*
 instantiate_color_picker(BView* view, BMessage* message,
-	BColorPickerPanel::color_cell_layout layout, const char* name,
+	BColorPickerPanel::color_cells_layout layout, const char* name,
 	window_look look, window_feel feel, uint32 flags, uint32 workspace)
 {
 	return new CrayonPickerPanel((CrayonPicker*)view, message);
