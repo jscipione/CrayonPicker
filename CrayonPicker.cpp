@@ -42,7 +42,7 @@ CrayonPicker::CrayonPicker()
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
 		.AddGlue()
-		.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(fSelectedColor)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING))
 			.AddGroup(B_VERTICAL, 0)
